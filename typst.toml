@@ -1,0 +1,17 @@
+[package]
+name = "corgis"
+version = "0.0.1"
+entrypoint = "lib.typ"
+authors = ["ricked-twice (https://github.com/ricked-twice)"]
+license = "GPL3"
+description = "easy slides in typst - sensible defaults, easy syntax, well styled"
+repository = "https://github.com/ricked-twice/corgis-typst-template"
+keywords = ["slides", "presentation", "beamer", "corgis"]
+categories = ["presentation"]
+compiler = "0.13.1"
+exclude = ["screenshots", "example"]
+
+[template]
+path = "template"
+entrypoint = "main.typ"
+thumbnail = "screenshots/Thumbnail.png"
