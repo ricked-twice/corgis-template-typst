@@ -4,8 +4,33 @@
   "large": ("height": 12cm, "space": 1.8cm),
 )
 
+// Colors
 #let orange = rgb("#eb811b")
 #let font-color = rgb("#23373b")
+#let block-color = orange.lighten(90%)
+#let header-color = orange.lighten(65%)
+#let fill-color = orange.lighten(50%)
+#let line-color = font-color.lighten(80%)
+#let background-color = rgb("#fafafa")
+
+#let section_counter = counter("section_counter")
+
+#let question_slides() = {
+  section_counter.step()
+  set page(footer: none, header: none, margin: 1cm)
+  align(horizon)[
+    #box(fill: font-color, inset: 10pt, width:1fr, radius: 15%)[
+      #align(center + horizon)[
+        #text(fill: orange.lighten(25%), size: 2.5em, "Questions?")
+      ]
+    ]
+    #align(center)[
+      #box(width: 2cm)[
+        #image("resources/corgis/corgi_end.png")
+      ]
+    ]
+  ]
+}
 
 #let slides(
   content,
@@ -19,6 +44,7 @@
   ratio: 16/9,
   corgis: true,
   toc: true,
+  count: "number",
   toc-depth: 1,
   theme: "full"
 ) = {
@@ -29,14 +55,6 @@
   }
   let (height, space) = layouts.at(layout)
   let width = ratio * height
-
-  // Colors
-  let block-color = orange.lighten(90%)
-  let header-color = orange.lighten(65%)
-  let fill-color = orange.lighten(50%)
-  let line-color = font-color.lighten(80%)
-
-  let background-color = rgb("#fafafa")
 
   // Setup
   set document(
@@ -118,17 +136,16 @@
     //       ]
     //     }
     //   }
-    // } else if count == "number" {
-    //   v(-space / 1.5)
-    //   set align(right + top)
-    //   context {
-    //     let last = counter(page).final().first()
-    //     let current = here().page()
-    //     set text(weight: "bold")
-    //     set text(fill: white) if theme == "full"
-    //     set text(fill: orange) if theme == "normal"
-    //     [#current / #last]
-    //   }
+    #if count == "number" {
+      v(-space / 1.33)
+      set align(right + top)
+      context {
+        let last = counter(page).final().first()
+        let current = here().page()
+        set text(weight: "bold")
+        set text(fill: orange)
+        [#current / #last]
+      }}
     ],
     header-ascent: 0%,
   // FOOTER
@@ -136,19 +153,18 @@
       #if corgis == true {
         v(-0.2cm)
         context {
-          let last = counter(page).final().first() + 1
-          let current = here().page()
-          let percentage = current / last
-          // for i in range(1,current) {}
-          // line(
-          //   start: (0%, 0%),
-          //   stroke: 1pt + rgb("#eb811b")
-          // )
-          set text(0.7em)
+          let total_number_of_section_and_title_slides = section_counter.final().first() + 1
+          let current_number_of_section_and_title_slides = section_counter.get().first() + 1
+          let last = counter(page).final().first() - total_number_of_section_and_title_slides
+          let current = here().page() - current_number_of_section_and_title_slides
+          let ratio = (current / last)
+          if ratio > 0.05 {
+            ratio -= 0.05
+          }
           // Colored Style
           box()[
             #line(
-              length: 100% * percentage,
+              length: 100% * ratio,
               stroke: 1pt + orange
             )
           ]
@@ -163,10 +179,12 @@
             "resources/corgis/corgi_2.png"
           }
           box(baseline: 25%)[#image(corgy_img)]
+          // If not present the second line is not proprely placed, but why this value? Magic is the answer
+          let magic_ratio = -65%
           box()[
             #line(
-              start: (100% * percentage + 18pt, -52%),
-              end: (100%, -52%),
+              start: (100% * ratio + 18pt, magic_ratio),
+              end: (100%, magic_ratio),
               stroke: 1pt+line-color
             )
           ]
@@ -206,7 +224,8 @@
         fill: (font-color, background-color),
         [#block(height: 100%)],[#text(1.2em, weight: "bold", fill: orange)[#x]]
       )
-
+    // Increment the section counter
+    section_counter.step()
   }
   show heading.where(level: 2): pagebreak(weak: true) // this is where the magic happens
   show heading: set text(1.1em, fill: orange)
@@ -214,7 +233,6 @@
 
   // ADD. STYLING --------------------------------------------------
   // Font color
-  
   show: set text(fill: font-color)
 
   // Terms
@@ -250,9 +268,9 @@
   // Table
   show table: set table(
     stroke: (x, y) => (
-      x: none,
-      bottom: 0.8pt+black,
-      top: if y == 0 {0.8pt+black} else if y==1 {0.4pt+black} else { 0pt },
+      x: 0.8pt + font-color,
+      bottom: 0.8pt+font-color,
+      top: if y == 0 {0.8pt+font-color} else if y==1 {0.4pt+font-color} else { 0pt },
     )
   )
 
@@ -349,6 +367,7 @@
         }
       )
     )
+    // counter(page).update(n => if n > 2 { n - 2 }  else { 0 })
   }
 
   // Outline

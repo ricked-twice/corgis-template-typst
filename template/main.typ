@@ -11,6 +11,7 @@
   // ratio: 16/9,
   // corgis: true,
   // toc: true,
+  // count: "number",
   // toc-depth: 1,
   // theme: "normal" or "full" (default is "full")
 )
@@ -35,3 +36,9 @@
 - Item B
   - Subitem B.A
     + Numbered sub-subitem B.A.1
+
+#question_slides()
+
+== Backup slide
+
+Hello there!
